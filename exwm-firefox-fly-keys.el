@@ -1,4 +1,4 @@
-;;; exwm-firefox-fly-keys.el --- Firefox hotkeys to functions -*- lexical-binding: t -*-
+;;; exwm-firefox-fly-keys.el --- Firefox hotkeys to functions -*- lexical-binding: nil -*-
 
 ;; Author: Stefan Huchler
 ;; URL: https://github.com/spiderbit/exwm-firefox-fly-keys
@@ -35,6 +35,9 @@
 (defvar exwm-firefox-class-name '("Firefox" "Nightly" "Iceweasel" "Icecat")
   "The class name used for detecting if a firefox buffer is selected.")
 
+(defvar exwm-firefox-fly-keys-mode-map (make-sparse-keymap))
+(defvar exwm-firefox-fly-e-keymap (make-sparse-keymap))
+
 ;; (defvar exwm-firefox-evil-insert-on-new-tab t
 ;;   "If non-nil, auto enter insert mode after opening new tab.")
 
@@ -52,15 +55,19 @@
   (xah-fly-insert-mode-activate))
 
 ;;; Keys
-(defvar exwm-firefox-fly-keys-mode-map (make-sparse-keymap))
+(set-keymap-parent exwm-firefox-fly-keys-mode-map xah-fly-key-map)
+(set-keymap-parent exwm-firefox-fly-e-keymap xah-fly-e-keymap)
 
+(define-key exwm-firefox-fly-keys-mode-map (kbd "<menu> e") exwm-firefox-fly-e-keymap)
+(define-key exwm-firefox-fly-e-keymap (kbd "e") 'exwm-edit--compose)
 ;; (define-key xah-fly-key-map [remap previous-line] 'exwm-firefox-core-up)
 ;; (define-key exwm-firefox-fly-keys-mode-map [remap next-line] 'exwm-firefox-core-down)
 ;; (define-key xah-fly-key-map [remap backward-char] 'exwm-firefox-core-left)
 ;; (define-key xah-fly-key-map [remap forward-char] 'exwm-firefox-core-right)
-;; (define-key xah-fly-key-map [remap xah-fly-command-mode-activate] 'exwm-firefox-fly-keys-normal)
+(define-key exwm-firefox-fly-keys-mode-map (kbd "<home>") 'exwm-firefox-fly-keys-normal)
 (define-key exwm-firefox-fly-keys-mode-map (kbd "u") 'exwm-firefox-fly-keys-insert)
-(define-key exwm-firefox-fly-keys-mode-map (kbd "<SPC>") 'exwm-firefox-fly-keys-insert)
+;; (define-key exwm-firefox-fly-keys-mode-map (kbd "<SPC>") 'exwm-firefox-fly-keys-insert)
+;; (define-key exwm-firefox-fly-keys-mode-map (kbd "<SPC>") nil)
 
     ;;;; Normal
 ;; Basic movements
@@ -84,8 +91,10 @@
 ;; (define-key exwm-firefox-evil-mode-map [remap evil-append] 'exwm-firefox-evil-insert)
 
 ;; Send enter to firefox
-(define-key exwm-firefox-fly-keys-mode-map (kbd "<return>") '(lambda () (interactive) (exwm-input--fake-key 'return)))
-(define-key exwm-firefox-fly-keys-mode-map (kbd "RET") '(lambda () (interactive) (exwm-input--fake-key 'return)))
+(define-key exwm-firefox-fly-keys-mode-map (kbd "<return>")
+  '(lambda () (interactive) (exwm-input--fake-key 'return)))
+(define-key exwm-firefox-fly-keys-mode-map (kbd "RET")
+  '(lambda () (interactive) (exwm-input--fake-key 'return)))
 
 ;; Move by half page
 (define-key exwm-firefox-fly-keys-mode-map (kbd "d") 'exwm-firefox-core-half-page-up)
@@ -146,7 +155,7 @@
   (if exwm-firefox-fly-keys-mode
       (progn
   	(exwm-firefox-fly-keys-normal)
-  	;; Auto enter insert mode on some actions
+	;; Auto enter insert mode on some actions
   	;; (if exwm-firefox-evil-insert-on-new-tab
   	;;     (advice-add #'exwm-firefox-core-tab-new :after #'exwm-firefox-evil-insert))
 
@@ -168,11 +177,7 @@
 Firefox variant can be assigned in 'exwm-firefox-fly-keys-firefox-name`"
   (interactive)
   (if (member exwm-class-name exwm-firefox-class-name)
-      (progn
-	(exwm-firefox-fly-keys-mode 1)
-	(exwm-firefox-activate))
-    ;; (exwm-firefox-deactivate)
-    ))
+      (exwm-firefox-fly-keys-mode 1)))
 
 (provide 'exwm-firefox-fly-keys)
 
